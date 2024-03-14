@@ -1,0 +1,47 @@
+seed_everything: true
+
+ckpt_path: null
+
+data:
+  class_path: "contrastive.MNISTDataModule"
+  init_args:
+    data_dir: "run/data"
+    mean: null
+    std: null
+    batch_size: 32
+    num_workers: 0
+
+model:
+  class_path: "contrastive.ConvEmbedding"
+  init_args:
+    num_channels: [32, 64]
+    embed_dim: 128
+    margin: 1.0
+    squared: true
+    eps: 1e-06
+    lr: 0.0001
+
+trainer:
+  accelerator: "cpu"
+  max_epochs: 100
+  log_every_n_steps: 100
+  logger:
+    class_path: "lightning.pytorch.loggers.TensorBoardLogger"
+    init_args:
+      save_dir: "run/"
+      name: "mnist_conv"
+      version: null
+  callbacks:
+    - class_path: "lightning.pytorch.callbacks.ModelCheckpoint"
+      init_args:
+        filename: "best"
+        monitor: "val_loss"
+        mode: "min"
+        save_top_k: 1
+    - class_path: "lightning.pytorch.callbacks.ModelCheckpoint"
+      init_args:
+        filename: "{epoch}"
+        save_top_k: -1
+        every_n_epochs: 1
+        save_last: true
+

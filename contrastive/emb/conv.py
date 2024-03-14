@@ -15,6 +15,12 @@ class ConvEmbedding(Embedding):
         Number of hidden channels.
     embed_dim : int
         Dimension of the embedding.
+    margin : float
+        Margin of the triplet loss.
+    squared : bools
+        Determines whether the Euclidean distance is squared.
+    eps : float
+        Small epsilon to avoid zeros.
     lr : float
         Initial optimizer learning rate.
 
@@ -23,6 +29,9 @@ class ConvEmbedding(Embedding):
     def __init__(self,
                  num_channels,
                  embed_dim,
+                 margin,
+                 squared=True,
+                 eps=1e-06,
                  lr=1e-04):
 
         # check channel numbers
@@ -48,7 +57,13 @@ class ConvEmbedding(Embedding):
         )
 
         # initialize embedding class
-        super().__init__(embedding, lr=lr)
+        super().__init__(
+            embedding,
+            margin,
+            squared=squared,
+            eps=eps,
+            lr=lr
+        )
 
         # store hyperparams
         self.save_hyperparameters(logger=True)

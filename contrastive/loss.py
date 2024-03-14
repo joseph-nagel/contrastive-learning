@@ -117,7 +117,7 @@ def make_triplet_ids(labels, mode='batch_all'):
         triplet_ids = torch.nonzero(triplet_idxmask) # (triplets, 3)
 
     elif mode == 'batch_hard':
-        raise NotImplementedError()
+        raise NotImplementedError('The only supported strategy is batch all')
 
     else:
         raise ValueError(f'Invalid triplet mining mode: {mode}')
@@ -134,11 +134,23 @@ class OnlineTripletLoss(nn.Module):
     A triplet loss with online triplet mining is implemented.
     Only a batch all mining strategy is supported at the moment.
 
+    Parameters
+    ----------
+    margin : float
+        Margin of the triplet loss.
+    squared : bools
+        Determines whether the Euclidean distance is squared.
+    eps : float
+        Small epsilon to avoid zeros.
+
     '''
 
-    def __init__(self, margin):
+    def __init__(self, margin, squared=True, eps=1e-06):
         super().__init__()
-        self.margin = margin
+
+        self.margin = abs(margin)
+        self.squared = squared
+        self.eps = abs(eps)
 
     def forward(self, embeddings, labels):
 
@@ -151,6 +163,15 @@ class OnlineTripletLoss(nn.Module):
 
         ap_distances = ap_terms.sum(dim=1) # (triplets)
         an_distances = an_terms.sum(dim=1) # (triplets)
+
+        if not self.squared:
+            # avoid zero values
+            ap_distances = ap_distances.clamp(min=self.eps)
+            an_distances = an_distances.clamp(min=self.eps)
+
+            # take square root
+            ap_distances = ap_distances.sqrt()
+            an_distances = an_distances.sqrt()
 
         # compute loss
         loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin) # (triplets)

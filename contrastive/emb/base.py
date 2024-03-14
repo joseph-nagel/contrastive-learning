@@ -3,6 +3,8 @@
 import torch
 from lightning.pytorch import LightningModule
 
+from ..loss import OnlineTripletLoss
+
 
 class Embedding(LightningModule):
     '''
@@ -12,16 +14,34 @@ class Embedding(LightningModule):
     ----------
     embedding : PyTorch module
         Model implementing the embedding.
+    margin : float
+        Margin of the triplet loss.
+    squared : bools
+        Determines whether the Euclidean distance is squared.
+    eps : float
+        Small epsilon to avoid zeros.
     lr : float
         Initial optimizer learning rate.
 
     '''
 
-    def __init__(self, embedding, lr=1e-04):
+    def __init__(self,
+                 embedding,
+                 margin,
+                 squared=True,
+                 eps=1e-06,
+                 lr=1e-04):
         super().__init__()
 
         # set embedding model
         self.embedding = embedding
+
+        # set loss function
+        self.triplet_loss = OnlineTripletLoss(
+            margin=margin,
+            squared=squared,
+            eps=eps
+        )
 
         # set initial learning rate
         self.lr = abs(lr)
@@ -53,9 +73,11 @@ class Embedding(LightningModule):
 
         return x_batch, y_batch
 
-    def loss(self, x):
+    def loss(self, x, y):
         '''Compute the loss.'''
-        raise NotImplementedError
+        emb = self(x)
+        loss = self.triplet_loss(emb, y)
+        return loss
 
     def training_step(self, batch, batch_idx):
         x_batch, y_batch = self._get_batch(batch)
