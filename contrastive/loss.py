@@ -157,25 +157,30 @@ class OnlineTripletLoss(nn.Module):
         # construct triplet IDs
         triplet_ids = make_triplet_ids(labels, mode='batch_all') # (triplets, 3)
 
-        # compute triplet distances
-        ap_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,1]]).pow(2) # (triplets, features)
-        an_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,2]]).pow(2) # (triplets, features)
+        if len(triplet_ids) > 0:
 
-        ap_distances = ap_terms.sum(dim=1) # (triplets)
-        an_distances = an_terms.sum(dim=1) # (triplets)
+            # compute triplet distances
+            ap_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,1]]).pow(2) # (triplets, features)
+            an_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,2]]).pow(2) # (triplets, features)
 
-        if not self.squared:
-            # avoid zero values
-            ap_distances = ap_distances.clamp(min=self.eps)
-            an_distances = an_distances.clamp(min=self.eps)
+            ap_distances = ap_terms.sum(dim=1) # (triplets)
+            an_distances = an_terms.sum(dim=1) # (triplets)
 
-            # take square root
-            ap_distances = ap_distances.sqrt()
-            an_distances = an_distances.sqrt()
+            if not self.squared:
+                # avoid zero values
+                ap_distances = ap_distances.clamp(min=self.eps)
+                an_distances = an_distances.clamp(min=self.eps)
 
-        # compute loss
-        loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin) # (triplets)
-        loss = loss_terms.mean()
+                # take square root
+                ap_distances = ap_distances.sqrt()
+                an_distances = an_distances.sqrt()
+
+            # compute loss
+            loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin) # (triplets)
+            loss = loss_terms.mean()
+
+        else:
+            loss = None # return None (rather than NaN) in case no valid triplet can be constructed
 
         return loss
 
