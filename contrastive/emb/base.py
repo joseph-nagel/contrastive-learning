@@ -16,6 +16,8 @@ class Embedding(LightningModule):
         Model implementing the embedding.
     margin : float
         Margin of the triplet loss.
+    mine_mode : {'batch_all', 'batch_hard'}
+        Batch triplet mining strategy.
     squared : bools
         Determines whether the Euclidean distance is squared.
     eps : float
@@ -28,6 +30,7 @@ class Embedding(LightningModule):
     def __init__(self,
                  embedding,
                  margin,
+                 mine_mode='batch_all',
                  squared=True,
                  eps=1e-06,
                  lr=1e-04):
@@ -39,6 +42,7 @@ class Embedding(LightningModule):
         # set loss function
         self.triplet_loss = OnlineTripletLoss(
             margin=margin,
+            mine_mode=mine_mode,
             squared=squared,
             eps=eps
         )
@@ -74,14 +78,14 @@ class Embedding(LightningModule):
         return x_batch, y_batch
 
     def loss(self, x, y):
-        '''Compute the loss.'''
-        emb = self(x)
-        loss = self.triplet_loss(emb, y)
+        '''Compute the triplet loss.'''
+        embeddings = self(x)
+        loss = self.triplet_loss(embeddings, y)
         return loss
 
     def training_step(self, batch, batch_idx):
         x_batch, y_batch = self._get_batch(batch)
-        loss = self.loss(x_batch, y_batch)
+        loss = self.loss(x_batch, y_batch) # note that Lightning dismisses steps with None loss
         if loss is not None:
             self.log('train_loss', loss.item()) # Lightning logs batch-wise metrics during training per default
         return loss

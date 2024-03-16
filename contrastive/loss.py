@@ -132,12 +132,14 @@ class OnlineTripletLoss(nn.Module):
     Summary
     -------
     A triplet loss with online triplet mining is implemented.
-    Only a batch all mining strategy is supported at the moment.
+    Batch all and batch hard triplet mining strategies are supported.
 
     Parameters
     ----------
     margin : float
         Margin of the triplet loss.
+    mine_mode : {'batch_all', 'batch_hard'}
+        Batch triplet mining strategy.
     squared : bools
         Determines whether the Euclidean distance is squared.
     eps : float
@@ -145,17 +147,23 @@ class OnlineTripletLoss(nn.Module):
 
     '''
 
-    def __init__(self, margin, squared=True, eps=1e-06):
+    def __init__(self,
+                 margin,
+                 mine_mode='batch_all',
+                 squared=True,
+                 eps=1e-06):
+
         super().__init__()
 
         self.margin = abs(margin)
+        self.mine_mode = mine_mode
         self.squared = squared
         self.eps = abs(eps)
 
     def forward(self, embeddings, labels):
 
         # construct triplet IDs
-        triplet_ids = make_triplet_ids(labels, mode='batch_all') # (triplets, 3)
+        triplet_ids = make_triplet_ids(labels, mode=self.mine_mode) # (triplets, 3)
 
         if len(triplet_ids) > 0:
 
