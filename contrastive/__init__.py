@@ -22,7 +22,7 @@ from .emb import Embedding, ConvEmbedding
 
 from .loss import (
     pairwise_distances,
-    make_triplet_ids,
+    make_all_triplet_ids,
     OnlineTripletLoss
 )
 

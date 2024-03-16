@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 
 
-@torch.no_grad()
 def pairwise_distances(x, squared=True, eps=1e-06):
     '''
     Compute the matrix of pairwise distances.
@@ -97,7 +96,7 @@ def _make_triplet_idxmask(labels):
 
 
 @torch.no_grad()
-def make_triplet_ids(labels, mode='batch_all'):
+def make_all_triplet_ids(labels):
     '''
     Create valid triplet IDs.
 
@@ -112,15 +111,8 @@ def make_triplet_ids(labels, mode='batch_all'):
     # construct triplet mask
     triplet_idxmask = _make_triplet_idxmask(labels) # (batch, batch, batch)
 
-    if mode == 'batch_all':
-        # construct all valid triplet IDs
-        triplet_ids = torch.nonzero(triplet_idxmask) # (triplets, 3)
-
-    elif mode == 'batch_hard':
-        raise NotImplementedError('The only supported strategy is batch all')
-
-    else:
-        raise ValueError(f'Invalid triplet mining mode: {mode}')
+    # construct all valid triplet IDs
+    triplet_ids = torch.nonzero(triplet_idxmask) # (triplets, 3)
 
     return triplet_ids
 
@@ -132,7 +124,7 @@ class OnlineTripletLoss(nn.Module):
     Summary
     -------
     A triplet loss with online triplet mining is implemented.
-    Batch all and batch hard triplet mining strategies are supported.
+    Only a batch all mining strategy is supported at the moment.
 
     Parameters
     ----------
@@ -156,14 +148,18 @@ class OnlineTripletLoss(nn.Module):
         super().__init__()
 
         self.margin = abs(margin)
-        self.mine_mode = mine_mode
         self.squared = squared
         self.eps = abs(eps)
 
+        if mine_mode in ('batch_all', 'batch_hard'):
+            self.mine_mode = mine_mode
+        else:
+            raise ValueError(f'Invalid triplet mining mode: {mine_mode}')
+
     def forward(self, embeddings, labels):
 
-        # construct triplet IDs
-        triplet_ids = make_triplet_ids(labels, mode=self.mine_mode) # (triplets, 3)
+        # construct all triplet IDs
+        triplet_ids = make_all_triplet_ids(labels) # (triplets, 3)
 
         if len(triplet_ids) > 0:
 
@@ -183,9 +179,14 @@ class OnlineTripletLoss(nn.Module):
                 ap_distances = ap_distances.sqrt()
                 an_distances = an_distances.sqrt()
 
-            # compute loss
-            loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin) # (triplets)
-            loss = loss_terms.mean()
+            # compute loss (batch all)
+            if self.mine_mode == 'batch_all':
+                loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin) # (triplets)
+                loss = loss_terms.mean()
+
+            # compute loss (batch hard)
+            else:
+                raise NotImplementedError('The only supported strategy is batch all')
 
         else:
             loss = None # return None (rather than NaN) in case no valid triplet can be constructed
