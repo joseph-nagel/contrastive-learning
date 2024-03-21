@@ -3,10 +3,10 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["contrastive"]
+packages = ["contralearn"]
 
 [project]
-name = "contrastive"
+name = "contralearn"
 version = "0.0.1"
 description = "Contrastive representation learning"
 readme = "README.md"

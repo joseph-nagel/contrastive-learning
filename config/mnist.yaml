@@ -3,7 +3,7 @@ seed_everything: null
 ckpt_path: null
 
 data:
-  class_path: "contrastive.MNISTDataModule"
+  class_path: "contralearn.MNISTDataModule"
   init_args:
     data_dir: "run/data"
     mean: null
@@ -12,19 +12,19 @@ data:
     num_workers: 0
 
 model:
-  class_path: "contrastive.ConvEmbedding"
+  class_path: "contralearn.ConvEmbedding"
   init_args:
-    num_channels: [32, 64]
-    num_features: 2
-    margin: 1.0
+    num_channels: [32, 48]
+    num_features: [64, 2]
+    margin: 0.5
     mine_mode: "batch_all"
     squared: true
     eps: 1e-06
-    lr: 0.001
+    lr: 0.0003
 
 trainer:
   accelerator: "cpu"
-  max_epochs: 50
+  max_epochs: 20
   log_every_n_steps: 100
   logger:
     class_path: "lightning.pytorch.loggers.TensorBoardLogger"
@@ -43,7 +43,7 @@ trainer:
       init_args:
         filename: "{epoch}"
         save_top_k: -1
-        every_n_epochs: 2
+        every_n_epochs: 1
         save_last: true
     # - class_path: "lightning.pytorch.callbacks.ModelCheckpoint"
     #   init_args:

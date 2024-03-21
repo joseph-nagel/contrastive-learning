@@ -75,7 +75,9 @@ class ConvEmbedding(Embedding):
         # create dense layers
         flattened_size = int((28 / (2**len(num_channels)))**2)
 
-        dense_layers = [nn.Linear(num_channels[-1] * flattened_size , num_features[0])]
+        dense_layers = [
+            nn.Linear(num_channels[-1] * flattened_size , num_features[0])
+        ]
 
         if len(num_features) == 2:
             dense_layers += [

@@ -34,6 +34,7 @@ class Embedding(LightningModule):
                  squared=True,
                  eps=1e-06,
                  lr=1e-04):
+
         super().__init__()
 
         # set embedding model
