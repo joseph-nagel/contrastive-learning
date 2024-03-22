@@ -1,4 +1,4 @@
-'''Embedding model.'''
+'''Base embedding.'''
 
 import torch
 from lightning.pytorch import LightningModule
