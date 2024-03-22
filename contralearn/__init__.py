@@ -6,12 +6,14 @@ Modules
 data : Datamodules.
 emb : Embedding model.
 loss : Loss functions.
+vis : Visualization tools.
 
 '''
 
 from . import data
 from . import emb
 from . import loss
+from . import vis
 
 
 from .data import MNISTDataModule
@@ -27,4 +29,6 @@ from .loss import (
     make_all_triplet_ids,
     OnlineTripletLoss
 )
+
+from .vis import make_gif, make_emb_imgs
 
