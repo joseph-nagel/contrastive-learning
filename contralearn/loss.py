@@ -117,6 +117,7 @@ def make_all_triplet_ids(labels):
     return triplet_ids
 
 
+# TODO: add batch-hard mining strategy
 class OnlineTripletLoss(nn.Module):
     '''
     Triplet loss with online triplet mining.
@@ -124,7 +125,7 @@ class OnlineTripletLoss(nn.Module):
     Summary
     -------
     A triplet loss with online triplet mining is implemented.
-    Only a batch all mining strategy is supported at the moment.
+    Only a batch-all mining strategy is supported at the moment.
 
     Parameters
     ----------
@@ -179,14 +180,14 @@ class OnlineTripletLoss(nn.Module):
                 ap_distances = ap_distances.sqrt()
                 an_distances = an_distances.sqrt()
 
-            # compute loss (batch all)
+            # compute loss (batch-all)
             if self.mine_mode == 'batch_all':
                 loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin) # (triplets)
                 loss = loss_terms.mean()
 
-            # compute loss (batch hard)
+            # compute loss (batch-hard)
             else:
-                raise NotImplementedError('The only supported strategy is batch all')
+                raise NotImplementedError('The only supported strategy is batch-all')
 
         else:
             loss = None # return None (rather than NaN) in case no valid triplet can be constructed

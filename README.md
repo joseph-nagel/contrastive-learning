@@ -5,6 +5,8 @@
 </p>
 
 This repo contains an example of contrastive representation learning.
+An embedding can be trained in such a way that similar samples (sharing the same label)
+are pulled together, while dissimilar ones (with different labels) are pushed apart.
 
 ## Installation
 

@@ -1,6 +1,12 @@
 '''
 Contrastive learning.
 
+Summary
+-------
+A mini library for contrastive representation learning is provided.
+Currently only a triplet loss function with online batch-all mining is implemented.
+Other loss functions and triplet mining schemes may be included in the future.
+
 Modules
 -------
 data : Datamodules.
