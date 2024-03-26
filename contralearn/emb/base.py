@@ -57,7 +57,7 @@ class Embedding(LightningModule):
             logger=True
         )
 
-    def __call__(self, x):
+    def forward(self, x):
         '''Embed the inputs.'''
         return self.embedding(x)
 
