@@ -16,11 +16,12 @@ vis : Visualization tools.
 
 '''
 
-from . import data
-from . import emb
-from . import loss
-from . import vis
-
+from . import (
+    data,
+    emb,
+    loss,
+    vis
+)
 
 from .data import MNISTDataModule
 
