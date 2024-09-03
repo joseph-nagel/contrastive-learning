@@ -33,6 +33,9 @@ trainer:
       name: "mnist"
       version: null
   callbacks:
+    - class_path: "lightning.pytorch.callbacks.LearningRateMonitor"
+      init_args:
+        logging_interval: null
     - class_path: "lightning.pytorch.callbacks.ModelCheckpoint"
       init_args:
         filename: "best"
