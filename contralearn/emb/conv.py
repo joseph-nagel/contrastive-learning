@@ -59,8 +59,7 @@ class ConvEmbedding(Embedding):
             nn.LeakyReLU(),
             nn.Conv2d(num_channels[0], num_channels[0], 3, padding='same'),
             nn.MaxPool2d(2),
-            nn.LeakyReLU(),
-
+            nn.LeakyReLU()
         ]
 
         if len(num_channels) == 2:
