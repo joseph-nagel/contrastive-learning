@@ -1,35 +1,41 @@
 '''Some utilities.'''
 
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
 
 
 @torch.no_grad()
-def embed_loader(emb, data_loader, return_labels=False):
+def embed_loader(
+    emb: nn.Module,
+    data_loader: DataLoader,
+    return_labels: bool = False
+):
     '''Embed all items in a data loader.'''
 
     emb.train(False) # activate train mode
 
-    embeddings = []
+    embeddings_list = []
 
     if return_labels:
-        labels = []
+        labels_list = []
 
     # loop over batches
     for x_batch, y_batch in data_loader:
 
         if return_labels:
-            labels.append(y_batch)
+            labels_list.append(y_batch)
 
         # compute embedding
         e_batch = emb(x_batch.to(emb.device))
         e_batch = e_batch.cpu()
 
-        embeddings.append(e_batch)
+        embeddings_list.append(e_batch)
 
-    embeddings = torch.cat(embeddings, dim=0)
+    embeddings = torch.cat(embeddings_list, dim=0)
 
     if return_labels:
-        labels = torch.cat(labels, dim=0)
+        labels = torch.cat(labels_list, dim=0)
 
     if return_labels:
         return embeddings, labels

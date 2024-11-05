@@ -1,5 +1,6 @@
 '''Conv. embedding.'''
 
+from collections.abc import Sequence
 from numbers import Number
 
 import torch.nn as nn
@@ -21,7 +22,7 @@ class ConvEmbedding(Embedding):
         Margin of the triplet loss.
     mine_mode : {'batch_all', 'batch_hard'}
         Batch triplet mining strategy.
-    squared : bools
+    squared : bool
         Determines whether the Euclidean distance is squared.
     eps : float
         Small epsilon to avoid zeros.
@@ -30,14 +31,16 @@ class ConvEmbedding(Embedding):
 
     '''
 
-    def __init__(self,
-                 num_channels,
-                 num_features,
-                 margin,
-                 mine_mode='batch_all',
-                 squared=True,
-                 eps=1e-06,
-                 lr=1e-04):
+    def __init__(
+        self,
+        num_channels: int | Sequence[int],
+        num_features: int | Sequence[int],
+        margin: float,
+        mine_mode: str = 'batch_all',
+        squared: bool = True,
+        eps: float = 1e-06,
+        lr: float = 1e-04
+    ) -> None:
 
         # check channel numbers
         if isinstance(num_channels, Number):
@@ -76,7 +79,7 @@ class ConvEmbedding(Embedding):
 
         dense_layers = [
             nn.Linear(num_channels[-1] * flattened_size , num_features[0])
-        ]
+        ] # type: list[nn.Module]
 
         if len(num_features) == 2:
             dense_layers += [

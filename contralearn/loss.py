@@ -4,7 +4,11 @@ import torch
 import torch.nn as nn
 
 
-def pairwise_distances(x, squared=True, eps=1e-06):
+def pairwise_distances(
+    x: torch.Tensor,
+    squared: bool = True,
+    eps: float = 1e-06
+) -> torch.Tensor:
     '''
     Compute the matrix of pairwise distances.
 
@@ -37,7 +41,7 @@ def pairwise_distances(x, squared=True, eps=1e-06):
 
 
 @torch.no_grad()
-def _make_pair_idxmasks(labels):
+def _make_pair_idxmasks(labels: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     '''
     Create index mask for valid pos./neg. pairs.
 
@@ -71,7 +75,7 @@ def _make_pair_idxmasks(labels):
 
 
 @torch.no_grad()
-def _make_triplet_idxmask(labels):
+def _make_triplet_idxmask(labels: torch.Tensor) -> torch.Tensor:
     '''
     Create index mask for valid triplets.
 
@@ -96,7 +100,7 @@ def _make_triplet_idxmask(labels):
 
 
 @torch.no_grad()
-def make_all_triplet_ids(labels):
+def make_all_triplet_ids(labels: torch.Tensor) -> torch.Tensor:
     '''
     Create valid triplet IDs.
 
@@ -133,18 +137,20 @@ class OnlineTripletLoss(nn.Module):
         Margin of the triplet loss.
     mine_mode : {'batch_all', 'batch_hard'}
         Batch triplet mining strategy.
-    squared : bools
+    squared : bool
         Determines whether the Euclidean distance is squared.
     eps : float
         Small epsilon to avoid zeros.
 
     '''
 
-    def __init__(self,
-                 margin,
-                 mine_mode='batch_all',
-                 squared=True,
-                 eps=1e-06):
+    def __init__(
+        self,
+        margin: float,
+        mine_mode: str = 'batch_all',
+        squared: bool = True,
+        eps: float = 1e-06
+    ) -> None:
 
         super().__init__()
 
@@ -157,7 +163,7 @@ class OnlineTripletLoss(nn.Module):
         else:
             raise ValueError(f'Invalid triplet mining mode: {mine_mode}')
 
-    def forward(self, embeddings, labels):
+    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> torch.Tensor | None:
 
         # construct all triplet IDs
         triplet_ids = make_all_triplet_ids(labels) # (triplets, 3)
@@ -172,6 +178,7 @@ class OnlineTripletLoss(nn.Module):
             an_distances = an_terms.sum(dim=1) # (triplets)
 
             if not self.squared:
+
                 # avoid zero values
                 ap_distances = ap_distances.clamp(min=self.eps)
                 an_distances = an_distances.clamp(min=self.eps)

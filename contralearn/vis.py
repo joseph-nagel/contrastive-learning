@@ -9,12 +9,14 @@ from PIL import Image
 from .emb import ConvEmbedding, embed_loader
 
 
-def make_gif(save_file,
-             img_dir,
-             pattern='**/*.png',
-             overwrite=True,
-             timesort=True,
-             **kwargs):
+def make_gif(
+    save_file,
+    img_dir,
+    pattern='**/*.png',
+    overwrite=True,
+    timesort=True,
+    **kwargs
+):
     '''
     Load images and create GIF animation.
 
@@ -65,16 +67,18 @@ def make_gif(save_file,
         raise FileExistsError('File already exists')
 
 
-def make_emb_imgs(save_dir,
-                  ckpt_dir,
-                  data_loader,
-                  pattern='**/*.ckpt',
-                  figsize=(5, 5),
-                  xlim=(-5, 5),
-                  ylim=(-5, 5),
-                  overwrite=True,
-                  timesort=True,
-                  **kwargs):
+def make_emb_imgs(
+    save_dir,
+    ckpt_dir,
+    data_loader,
+    pattern='**/*.ckpt',
+    figsize=(5, 5),
+    xlim=(-5, 5),
+    ylim=(-5, 5),
+    overwrite=True,
+    timesort=True,
+    **kwargs
+):
     '''
     Load checkpoints and save embedding visualizations.
 
@@ -119,6 +123,7 @@ def make_emb_imgs(save_dir,
 
         # create figure
         fig, ax = plt.subplots(figsize=figsize)
+
         for idx in range(10):
             ax.scatter(
                 embeddings[labels==idx, 0][::2].numpy(),
@@ -128,6 +133,7 @@ def make_emb_imgs(save_dir,
                 edgecolors='none',
                 label=f'{idx}'
             )
+
         ax.set(xlim=xlim, ylim=ylim)
         ax.set_aspect('equal', adjustable='box')
         ax.legend(loc='center left')

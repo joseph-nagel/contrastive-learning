@@ -1,9 +1,16 @@
 '''Base embedding.'''
 
+from collections.abc import Sequence
+
 import torch
+import torch.nn as nn
 from lightning.pytorch import LightningModule
 
 from ..loss import OnlineTripletLoss
+
+
+# define type alias
+BatchType = torch.Tensor | Sequence[torch.Tensor] | dict[str, torch.Tensor]
 
 
 class Embedding(LightningModule):
@@ -18,7 +25,7 @@ class Embedding(LightningModule):
         Margin of the triplet loss.
     mine_mode : {'batch_all', 'batch_hard'}
         Batch triplet mining strategy.
-    squared : bools
+    squared : bool
         Determines whether the Euclidean distance is squared.
     eps : float
         Small epsilon to avoid zeros.
@@ -27,13 +34,15 @@ class Embedding(LightningModule):
 
     '''
 
-    def __init__(self,
-                 embedding,
-                 margin,
-                 mine_mode='batch_all',
-                 squared=True,
-                 eps=1e-06,
-                 lr=1e-04):
+    def __init__(
+        self,
+        embedding: nn.Module,
+        margin: float,
+        mine_mode: str = 'batch_all',
+        squared: bool = True,
+        eps: float = 1e-06,
+        lr: float = 1e-04
+    ) -> None:
 
         super().__init__()
 
@@ -57,12 +66,12 @@ class Embedding(LightningModule):
             logger=True
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         '''Embed the inputs.'''
         return self.embedding(x)
 
     @staticmethod
-    def _get_batch(batch):
+    def _get_batch(batch: BatchType) -> tuple[torch.Tensor, torch.Tensor]:
         '''Get batch features and labels.'''
 
         if isinstance(batch, (tuple, list)):
@@ -78,27 +87,27 @@ class Embedding(LightningModule):
 
         return x_batch, y_batch
 
-    def loss(self, x, y):
+    def loss(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         '''Compute the triplet loss.'''
         embeddings = self(x)
         loss = self.triplet_loss(embeddings, y)
         return loss
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch: BatchType, batch_idx: int) -> torch.Tensor:
         x_batch, y_batch = self._get_batch(batch)
         loss = self.loss(x_batch, y_batch) # note that Lightning dismisses steps with None loss
         if loss is not None:
             self.log('train_loss', loss.item()) # Lightning logs batch-wise scalars during training per default
         return loss
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch: BatchType, batch_idx: int) -> torch.Tensor:
         x_batch, y_batch = self._get_batch(batch)
         loss = self.loss(x_batch, y_batch)
         if loss is not None:
             self.log('val_loss', loss.item()) # Lightning automatically averages scalars over batches for validation
         return loss
 
-    def test_step(self, batch, batch_idx):
+    def test_step(self, batch: BatchType, batch_idx: int) -> torch.Tensor:
         x_batch, y_batch = self._get_batch(batch)
         loss = self.loss(x_batch, y_batch)
         if loss is not None:
@@ -106,7 +115,7 @@ class Embedding(LightningModule):
         return loss
 
     # TODO: enable LR scheduling
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> torch.optim.Optimizer:
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
 
