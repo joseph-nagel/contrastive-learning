@@ -6,10 +6,6 @@ from torchvision import datasets, transforms
 from lightning import LightningDataModule
 
 
-# define type alias
-FloatOrFloats = float | tuple[float, float, float]
-
-
 class MNISTDataModule(LightningDataModule):
     '''
     DataModule for the MNIST dataset.
@@ -18,9 +14,9 @@ class MNISTDataModule(LightningDataModule):
     ----------
     data_dir : str
         Directory for storing the data.
-    mean : float, (float, float, float) or None
+    mean : float or None
         Mean for data normalization.
-    std : float, (float, float, float) or None
+    std : float or None
         Standard deviation for normalization.
     batch_size : int
         Batch size of the data loader.
@@ -32,8 +28,8 @@ class MNISTDataModule(LightningDataModule):
     def __init__(
         self,
         data_dir: str,
-        mean: FloatOrFloats | None = None,
-        std: FloatOrFloats | None = None,
+        mean: float | None = None,
+        std: float | None = None,
         batch_size: int = 32,
         num_workers: int = 0
     ) -> None:
