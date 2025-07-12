@@ -25,17 +25,17 @@ def pairwise_distances(
         raise ValueError('Two-dim. tensor expected')
 
     # compute squared distances
-    dot_product = torch.matmul(x, x.T) # (batch, batch)
+    dot_product = torch.matmul(x, x.T)  # (batch, batch)
 
-    squared_norm = torch.diag(dot_product) # (batch)
+    squared_norm = torch.diag(dot_product)  # (batch)
 
-    distances = squared_norm.unsqueeze(0) - 2.0 * dot_product + squared_norm.unsqueeze(1) # (batch, batch)
+    distances = squared_norm.unsqueeze(0) - 2.0 * dot_product + squared_norm.unsqueeze(1)  # (batch, batch)
 
     if squared:
-        distances = nn.functional.relu(distances) # avoid negative values
+        distances = nn.functional.relu(distances)  # avoid negative values
     else:
-        distances = distances.clamp(min=eps) # avoid zero values
-        distances = distances.sqrt() # compute square root
+        distances = distances.clamp(min=eps)  # avoid zero values
+        distances = distances.sqrt()  # compute square root
 
     return distances
 
@@ -60,11 +60,11 @@ def _make_pair_idxmasks(labels: torch.Tensor) -> tuple[torch.Tensor, torch.Tenso
     # construct index masks
     batch_size = len(labels)
 
-    same_index = torch.eye(batch_size, device=labels.device).bool() # (batch, batch)
+    same_index = torch.eye(batch_size, device=labels.device).bool()  # (batch, batch)
     diff_index = ~same_index
 
     # construct label masks
-    same_label = (labels.unsqueeze(1) == labels.unsqueeze(0)) # (batch, batch)
+    same_label = (labels.unsqueeze(1) == labels.unsqueeze(0))  # (batch, batch)
     diff_label = ~same_label
 
     # create pos./neg. masks
@@ -88,13 +88,13 @@ def _make_triplet_idxmask(labels: torch.Tensor) -> torch.Tensor:
     '''
 
     # create pos./neg. masks
-    pos_idxmask, neg_idxmask = _make_pair_idxmasks(labels) # (batch, batch)
+    pos_idxmask, neg_idxmask = _make_pair_idxmasks(labels)  # (batch, batch)
 
     # create triplet mask
-    pos_idxmask = pos_idxmask.unsqueeze(2) # (batch, batch, 1)
-    neg_idxmask = neg_idxmask.unsqueeze(1) # (batch, 1, batch)
+    pos_idxmask = pos_idxmask.unsqueeze(2)  # (batch, batch, 1)
+    neg_idxmask = neg_idxmask.unsqueeze(1)  # (batch, 1, batch)
 
-    triplet_idxmask = (pos_idxmask & neg_idxmask) # (batch, batch, batch)
+    triplet_idxmask = (pos_idxmask & neg_idxmask)  # (batch, batch, batch)
 
     return triplet_idxmask
 
@@ -113,10 +113,10 @@ def make_all_triplet_ids(labels: torch.Tensor) -> torch.Tensor:
     '''
 
     # construct triplet mask
-    triplet_idxmask = _make_triplet_idxmask(labels) # (batch, batch, batch)
+    triplet_idxmask = _make_triplet_idxmask(labels)  # (batch, batch, batch)
 
     # construct all valid triplet IDs
-    triplet_ids = torch.nonzero(triplet_idxmask) # (triplets, 3)
+    triplet_ids = torch.nonzero(triplet_idxmask)  # (triplets, 3)
 
     return triplet_ids
 
@@ -166,16 +166,16 @@ class OnlineTripletLoss(nn.Module):
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> torch.Tensor | None:
 
         # construct all triplet IDs
-        triplet_ids = make_all_triplet_ids(labels) # (triplets, 3)
+        triplet_ids = make_all_triplet_ids(labels)  # (triplets, 3)
 
         if len(triplet_ids) > 0:
 
             # compute triplet distances
-            ap_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,1]]).pow(2) # (triplets, features)
-            an_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,2]]).pow(2) # (triplets, features)
+            ap_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,1]]).pow(2)  # (triplets, features)
+            an_terms = (embeddings[triplet_ids[:,0]] - embeddings[triplet_ids[:,2]]).pow(2)  # (triplets, features)
 
-            ap_distances = ap_terms.sum(dim=1) # (triplets)
-            an_distances = an_terms.sum(dim=1) # (triplets)
+            ap_distances = ap_terms.sum(dim=1)  # (triplets)
+            an_distances = an_terms.sum(dim=1)  # (triplets)
 
             if not self.squared:
 
@@ -189,7 +189,7 @@ class OnlineTripletLoss(nn.Module):
 
             # compute loss (batch-all)
             if self.mine_mode == 'batch_all':
-                loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin) # (triplets)
+                loss_terms = nn.functional.relu(ap_distances - an_distances + self.margin)  # (triplets)
                 loss = loss_terms.mean()
 
             # compute loss (batch-hard)
@@ -197,7 +197,7 @@ class OnlineTripletLoss(nn.Module):
                 raise NotImplementedError('The only supported strategy is batch-all')
 
         else:
-            loss = None # return None (rather than NaN) in case no valid triplet can be constructed
+            loss = None  # return None (rather than NaN) in case no valid triplet can be constructed
 
         return loss
 

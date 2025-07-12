@@ -13,7 +13,7 @@ def embed_loader(
 ):
     '''Embed all items in a data loader.'''
 
-    emb.train(False) # activate train mode
+    emb.train(False)  # activate train mode
 
     embeddings_list = []
 

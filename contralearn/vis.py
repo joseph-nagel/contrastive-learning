@@ -39,7 +39,7 @@ def make_gif(
     # get sorted image files
     img_files = sorted(
         img_dir.glob(pattern),
-        key=(lambda f: f.stat().st_mtime) if timesort else None # sort according to creation time
+        key=(lambda f: f.stat().st_mtime) if timesort else None  # sort according to creation time
     )
 
     # load frames
@@ -99,7 +99,7 @@ def make_emb_imgs(
     # get sorted checkpoint files
     ckpt_files = sorted(
         ckpt_dir.glob(pattern),
-        key=(lambda f: f.stat().st_mtime) if timesort else None # sort according to creation time
+        key=(lambda f: f.stat().st_mtime) if timesort else None  # sort according to creation time
     )
 
     # set device

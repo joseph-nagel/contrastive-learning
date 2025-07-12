@@ -79,7 +79,7 @@ class ConvEmbedding(Embedding):
 
         dense_layers = [
             nn.Linear(num_channels[-1] * flattened_size , num_features[0])
-        ] # type: list[nn.Module]
+        ]  # type: list[nn.Module]
 
         if len(num_features) == 2:
             dense_layers += [
