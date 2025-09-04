@@ -12,7 +12,6 @@ are pulled together, while dissimilar ones (with different labels) are pushed ap
 ## Notebooks
 
 - [Introduction](notebooks/intro.ipynb)
-
 - [MNIST example](notebooks/mnist.ipynb)
 
 
@@ -28,4 +27,3 @@ pip install -e .
 ```
 python scripts/main.py fit --config config/mnist.yaml
 ```
-

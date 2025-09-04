@@ -32,4 +32,3 @@ interactive = [
 
 [project.urls]
 source = "https://github.com/joseph-nagel/contrastive-learning"
-

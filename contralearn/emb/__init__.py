@@ -19,4 +19,3 @@ from .base import Embedding
 from .conv import ConvEmbedding
 
 from .utils import embed_loader
-

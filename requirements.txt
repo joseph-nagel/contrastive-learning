@@ -5,4 +5,3 @@ lightning
 tensorboard
 matplotlib
 notebook
-

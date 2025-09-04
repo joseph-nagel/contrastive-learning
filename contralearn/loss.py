@@ -200,4 +200,3 @@ class OnlineTripletLoss(nn.Module):
             loss = None  # return None (rather than NaN) in case no valid triplet can be constructed
 
         return loss
-

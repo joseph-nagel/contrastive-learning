@@ -151,4 +151,3 @@ def make_emb_imgs(
             raise FileExistsError('File already exists')
 
         plt.close(fig)
-

@@ -41,4 +41,3 @@ def embed_loader(
         return embeddings, labels
     else:
         return embeddings
-

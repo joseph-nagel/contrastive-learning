@@ -38,4 +38,3 @@ from .loss import (
 )
 
 from .vis import make_gif, make_emb_imgs
-
