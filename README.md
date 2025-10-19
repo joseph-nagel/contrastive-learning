@@ -17,13 +17,13 @@ are pulled together, while dissimilar ones (with different labels) are pushed ap
 
 ## Installation
 
-```
+```bash
 pip install -e .
 ```
 
 
 ## Training
 
-```
+```bash
 python scripts/main.py fit --config config/mnist.yaml
 ```
