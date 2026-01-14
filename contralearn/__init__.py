@@ -22,19 +22,15 @@ from . import (
     loss,
     vis
 )
-
 from .data import MNISTDataModule
-
 from .emb import (
     Embedding,
     ConvEmbedding,
     embed_loader
 )
-
 from .loss import (
     pairwise_distances,
     make_all_triplet_ids,
     OnlineTripletLoss
 )
-
 from .vis import make_gif, make_emb_imgs
