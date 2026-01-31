@@ -21,11 +21,7 @@ dependencies = [
     "torch",
     "torchvision",
     "lightning",
-    "tensorboard"
-]
-
-[project.optional-dependencies]
-interactive = [
+    "tensorboard",
     "matplotlib",
     "notebook"
 ]

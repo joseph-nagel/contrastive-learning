@@ -137,7 +137,7 @@ def make_emb_imgs(
         ax.set(xlim=xlim, ylim=ylim)
         ax.set_aspect('equal', adjustable='box')
         ax.legend(loc='center left')
-        ax.grid(visible=True, which='both', color='lightgray', linestyle='-')
+        ax.grid(color='lightgray', linestyle='-')
         ax.set_axisbelow(True)
         fig.tight_layout()
 

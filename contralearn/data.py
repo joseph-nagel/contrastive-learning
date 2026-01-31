@@ -32,8 +32,7 @@ class MNISTDataModule(LightningDataModule):
         std: float | None = None,
         batch_size: int = 32,
         num_workers: int = 0
-    ) -> None:
-
+    ):
         super().__init__()
 
         # set data location
@@ -62,13 +61,11 @@ class MNISTDataModule(LightningDataModule):
 
     def prepare_data(self) -> None:
         '''Download data.'''
-
         train_set = datasets.MNIST(
             self.data_dir,
             train=True,
             download=True
         )
-
         test_set = datasets.MNIST(
             self.data_dir,
             train=False,

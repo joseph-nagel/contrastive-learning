@@ -26,9 +26,7 @@ def pairwise_distances(
 
     # compute squared distances
     dot_product = torch.matmul(x, x.T)  # (batch, batch)
-
     squared_norm = torch.diag(dot_product)  # (batch)
-
     distances = squared_norm.unsqueeze(0) - 2.0 * dot_product + squared_norm.unsqueeze(1)  # (batch, batch)
 
     if squared:
@@ -59,7 +57,6 @@ def _make_pair_idxmasks(labels: torch.Tensor) -> tuple[torch.Tensor, torch.Tenso
 
     # construct index masks
     batch_size = len(labels)
-
     same_index = torch.eye(batch_size, device=labels.device).bool()  # (batch, batch)
     diff_index = ~same_index
 
@@ -150,8 +147,7 @@ class OnlineTripletLoss(nn.Module):
         mine_mode: str = 'batch_all',
         squared: bool = True,
         eps: float = 1e-06
-    ) -> None:
-
+    ):
         super().__init__()
 
         self.margin = abs(margin)

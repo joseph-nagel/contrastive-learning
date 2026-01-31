@@ -9,7 +9,6 @@ from lightning.pytorch import LightningModule
 from ..loss import OnlineTripletLoss
 
 
-# define type alias
 BatchType = torch.Tensor | Sequence[torch.Tensor] | dict[str, torch.Tensor]
 
 
@@ -42,8 +41,7 @@ class Embedding(LightningModule):
         squared: bool = True,
         eps: float = 1e-06,
         lr: float = 1e-04
-    ) -> None:
-
+    ):
         super().__init__()
 
         # set embedding model

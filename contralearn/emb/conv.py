@@ -40,7 +40,7 @@ class ConvEmbedding(Embedding):
         squared: bool = True,
         eps: float = 1e-06,
         lr: float = 1e-04
-    ) -> None:
+    ):
 
         # check channel numbers
         if isinstance(num_channels, Number):
