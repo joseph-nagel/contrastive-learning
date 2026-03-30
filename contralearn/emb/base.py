@@ -1,4 +1,4 @@
-'''Base embedding.'''
+"""Base embedding."""
 
 from collections.abc import Sequence
 
@@ -13,7 +13,7 @@ BatchType = torch.Tensor | Sequence[torch.Tensor] | dict[str, torch.Tensor]
 
 
 class Embedding(LightningModule):
-    '''
+    """
     Base embedding model.
 
     Parameters
@@ -31,16 +31,16 @@ class Embedding(LightningModule):
     lr : float
         Initial optimizer learning rate.
 
-    '''
+    """
 
     def __init__(
         self,
         embedding: nn.Module,
         margin: float,
-        mine_mode: str = 'batch_all',
+        mine_mode: str = "batch_all",
         squared: bool = True,
         eps: float = 1e-06,
-        lr: float = 1e-04
+        lr: float = 1e-04,
     ):
         super().__init__()
 
@@ -52,41 +52,38 @@ class Embedding(LightningModule):
             margin=margin,
             mine_mode=mine_mode,
             squared=squared,
-            eps=eps
+            eps=eps,
         )
 
         # set initial learning rate
         self.lr = abs(lr)
 
         # store hyperparams
-        self.save_hyperparameters(
-            ignore=['embedding'],
-            logger=True
-        )
+        self.save_hyperparameters(ignore=["embedding"], logger=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        '''Embed the inputs.'''
+        """Embed the inputs."""
         return self.embedding(x)
 
     @staticmethod
     def _get_batch(batch: BatchType) -> tuple[torch.Tensor, torch.Tensor]:
-        '''Get batch features and labels.'''
+        """Get batch features and labels."""
 
         if isinstance(batch, (tuple, list)):
             x_batch = batch[0]
             y_batch = batch[1]
 
         elif isinstance(batch, dict):
-            x_batch = batch['features']
-            y_batch = batch['labels']
+            x_batch = batch["features"]
+            y_batch = batch["labels"]
 
         else:
-            raise TypeError(f'Invalid batch type: {type(batch)}')
+            raise TypeError(f"Invalid batch type: {type(batch)}")
 
         return x_batch, y_batch
 
     def loss(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        '''Compute the triplet loss.'''
+        """Compute the triplet loss."""
         embeddings = self(x)
         loss = self.triplet_loss(embeddings, y)
         return loss
@@ -95,21 +92,21 @@ class Embedding(LightningModule):
         x_batch, y_batch = self._get_batch(batch)
         loss = self.loss(x_batch, y_batch)  # note that Lightning dismisses steps with None loss
         if loss is not None:
-            self.log('train_loss', loss.item())  # Lightning logs batch-wise scalars during training per default
+            self.log("train_loss", loss.item())  # Lightning logs batch-wise scalars during training per default
         return loss
 
     def validation_step(self, batch: BatchType, batch_idx: int) -> torch.Tensor:
         x_batch, y_batch = self._get_batch(batch)
         loss = self.loss(x_batch, y_batch)
         if loss is not None:
-            self.log('val_loss', loss.item())  # Lightning automatically averages scalars over batches for validation
+            self.log("val_loss", loss.item())  # Lightning automatically averages scalars over batches for validation
         return loss
 
     def test_step(self, batch: BatchType, batch_idx: int) -> torch.Tensor:
         x_batch, y_batch = self._get_batch(batch)
         loss = self.loss(x_batch, y_batch)
         if loss is not None:
-            self.log('test_loss', loss.item())  # Lightning automatically averages scalars over batches for testing
+            self.log("test_loss", loss.item())  # Lightning automatically averages scalars over batches for testing
         return loss
 
     # TODO: enable LR scheduling

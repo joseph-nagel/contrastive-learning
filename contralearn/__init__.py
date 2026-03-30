@@ -1,4 +1,4 @@
-'''
+"""
 Contrastive learning.
 
 Summary
@@ -14,23 +14,10 @@ emb : Embedding model.
 loss : Loss functions.
 vis : Visualization tools.
 
-'''
+"""
 
-from . import (
-    data,
-    emb,
-    loss,
-    vis
-)
+from . import data, emb, loss, vis
 from .data import MNISTDataModule
-from .emb import (
-    Embedding,
-    ConvEmbedding,
-    embed_loader
-)
-from .loss import (
-    pairwise_distances,
-    make_all_triplet_ids,
-    OnlineTripletLoss
-)
+from .emb import Embedding, ConvEmbedding, embed_loader
+from .loss import pairwise_distances, make_all_triplet_ids, OnlineTripletLoss
 from .vis import make_gif, make_emb_imgs

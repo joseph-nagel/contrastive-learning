@@ -1,4 +1,4 @@
-'''Visualization tools.'''
+"""Visualization tools."""
 
 from pathlib import Path
 
@@ -12,12 +12,12 @@ from .emb import ConvEmbedding, embed_loader
 def make_gif(
     save_file,
     img_dir,
-    pattern='**/*.png',
+    pattern="**/*.png",
     overwrite=True,
     timesort=True,
-    **kwargs
+    **kwargs,
 ):
-    '''
+    """
     Load images and create GIF animation.
 
     Summary
@@ -25,7 +25,7 @@ def make_gif(
     The function loads a directory of images
     and transforms them into a GIF animation.
 
-    '''
+    """
 
     save_file = Path(save_file)
     img_dir = Path(img_dir)
@@ -39,7 +39,7 @@ def make_gif(
     # get sorted image files
     img_files = sorted(
         img_dir.glob(pattern),
-        key=(lambda f: f.stat().st_mtime) if timesort else None  # sort according to creation time
+        key=(lambda f: f.stat().st_mtime) if timesort else None,  # sort according to creation time
     )
 
     # load frames
@@ -54,32 +54,27 @@ def make_gif(
         # imageio.mimsave(save_file, frames, **kwargs)
 
         # calculate duration per frame in [ms]
-        if 'fps' in kwargs:
-            kwargs['duration'] = 1000 / kwargs.pop('fps')
+        if "fps" in kwargs:
+            kwargs["duration"] = 1000 / kwargs.pop("fps")
 
-        frames[0].save(
-            save_file,
-            save_all=True,
-            append_images=frames[1:],
-            **kwargs
-        )
+        frames[0].save(save_file, save_all=True, append_images=frames[1:], **kwargs)
     else:
-        raise FileExistsError('File already exists')
+        raise FileExistsError("File already exists")
 
 
 def make_emb_imgs(
     save_dir,
     ckpt_dir,
     data_loader,
-    pattern='**/*.ckpt',
+    pattern="**/*.ckpt",
     figsize=(5, 5),
     xlim=(-5, 5),
     ylim=(-5, 5),
     overwrite=True,
     timesort=True,
-    **kwargs
+    **kwargs,
 ):
-    '''
+    """
     Load checkpoints and save embedding visualizations.
 
     Summary
@@ -87,7 +82,7 @@ def make_emb_imgs(
     This function loads all checkpoints in a directory and saves
     visualizations of the corresponding 2D embeddings.
 
-    '''
+    """
 
     save_dir = Path(save_dir)
     ckpt_dir = Path(ckpt_dir)
@@ -99,15 +94,14 @@ def make_emb_imgs(
     # get sorted checkpoint files
     ckpt_files = sorted(
         ckpt_dir.glob(pattern),
-        key=(lambda f: f.stat().st_mtime) if timesort else None  # sort according to creation time
+        key=(lambda f: f.stat().st_mtime) if timesort else None,  # sort according to creation time
     )
 
     # set device
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # loop over checkpoints
     for ckpt_idx, ckpt_file in enumerate(ckpt_files):
-
         # import model
         emb = ConvEmbedding.load_from_checkpoint(ckpt_file)
 
@@ -115,39 +109,35 @@ def make_emb_imgs(
         emb = emb.to(device)
 
         # encode loader
-        embeddings, labels = embed_loader(
-            emb,
-            data_loader,
-            return_labels=True
-        )
+        embeddings, labels = embed_loader(emb, data_loader, return_labels=True)
 
         # create figure
         fig, ax = plt.subplots(figsize=figsize)
 
         for idx in range(10):
             ax.scatter(
-                embeddings[labels==idx, 0][::2].numpy(),
-                embeddings[labels==idx, 1][::2].numpy(),
+                embeddings[labels == idx, 0][::2].numpy(),
+                embeddings[labels == idx, 1][::2].numpy(),
                 color=plt.cm.tab10(idx),
                 alpha=0.3,
-                edgecolors='none',
-                label=f'{idx}'
+                edgecolors="none",
+                label=f"{idx}",
             )
 
         ax.set(xlim=xlim, ylim=ylim)
-        ax.set_aspect('equal', adjustable='box')
-        ax.legend(loc='center left')
-        ax.grid(color='lightgray', linestyle='-')
+        ax.set_aspect("equal", adjustable="box")
+        ax.legend(loc="center left")
+        ax.grid(color="lightgray", linestyle="-")
         ax.set_axisbelow(True)
         fig.tight_layout()
 
         # save figure
-        file_name = '{}.png'.format(ckpt_file.stem)
+        file_name = "{}.png".format(ckpt_file.stem)
         save_file = save_dir / file_name
 
         if not save_file.exists() or overwrite:
             fig.savefig(save_file, **kwargs)
         else:
-            raise FileExistsError('File already exists')
+            raise FileExistsError("File already exists")
 
         plt.close(fig)

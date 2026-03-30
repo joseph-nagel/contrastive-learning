@@ -1,4 +1,4 @@
-'''Conv. embedding.'''
+"""Conv. embedding."""
 
 from collections.abc import Sequence
 from numbers import Number
@@ -9,7 +9,7 @@ from .base import Embedding
 
 
 class ConvEmbedding(Embedding):
-    '''
+    """
     Conv. embedding model.
 
     Parameters
@@ -29,17 +29,17 @@ class ConvEmbedding(Embedding):
     lr : float
         Initial optimizer learning rate.
 
-    '''
+    """
 
     def __init__(
         self,
         num_channels: int | Sequence[int],
         num_features: int | Sequence[int],
         margin: float,
-        mine_mode: str = 'batch_all',
+        mine_mode: str = "batch_all",
         squared: bool = True,
         eps: float = 1e-06,
-        lr: float = 1e-04
+        lr: float = 1e-04,
     ):
 
         # check channel numbers
@@ -47,52 +47,46 @@ class ConvEmbedding(Embedding):
             num_channels = [num_channels]
 
         if len(num_channels) not in (1, 2):
-            raise ValueError('One or two channel numbers expected')
+            raise ValueError("One or two channel numbers expected")
 
         # check feature numbers
         if isinstance(num_features, Number):
             num_features = [num_features]
 
         if len(num_features) not in (1, 2):
-            raise ValueError('One or two feature numbers expected')
+            raise ValueError("One or two feature numbers expected")
 
         # create double conv blocks
         conv_layers = [
-            nn.Conv2d(1, num_channels[0], 3, padding='same'),
+            nn.Conv2d(1, num_channels[0], 3, padding="same"),
             nn.LeakyReLU(),
-            nn.Conv2d(num_channels[0], num_channels[0], 3, padding='same'),
+            nn.Conv2d(num_channels[0], num_channels[0], 3, padding="same"),
             nn.MaxPool2d(2),
-            nn.LeakyReLU()
+            nn.LeakyReLU(),
         ]
 
         if len(num_channels) == 2:
             conv_layers += [
-                nn.Conv2d(num_channels[0], num_channels[1], 3, padding='same'),
+                nn.Conv2d(num_channels[0], num_channels[1], 3, padding="same"),
                 nn.LeakyReLU(),
-                nn.Conv2d(num_channels[1], num_channels[1], 3, padding='same'),
+                nn.Conv2d(num_channels[1], num_channels[1], 3, padding="same"),
                 nn.MaxPool2d(2),
-                nn.LeakyReLU()
+                nn.LeakyReLU(),
             ]
 
         # create dense layers
-        flattened_size = int((28 / (2**len(num_channels)))**2)
+        flattened_size = int((28 / (2 ** len(num_channels))) ** 2)
 
-        dense_layers = [
-            nn.Linear(num_channels[-1] * flattened_size , num_features[0])
-        ]  # type: list[nn.Module]
+        dense_layers = [nn.Linear(num_channels[-1] * flattened_size, num_features[0])]  # type: list[nn.Module]
 
         if len(num_features) == 2:
             dense_layers += [
                 nn.LeakyReLU(),
-                nn.Linear(num_features[0], num_features[1])
+                nn.Linear(num_features[0], num_features[1]),
             ]
 
         # create embedding model
-        embedding = nn.Sequential(
-            *conv_layers,
-            nn.Flatten(),
-            *dense_layers
-        )
+        embedding = nn.Sequential(*conv_layers, nn.Flatten(), *dense_layers)
 
         # initialize embedding class
         super().__init__(
@@ -101,7 +95,7 @@ class ConvEmbedding(Embedding):
             mine_mode=mine_mode,
             squared=squared,
             eps=eps,
-            lr=lr
+            lr=lr,
         )
 
         # store hyperparams

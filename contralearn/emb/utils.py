@@ -1,4 +1,4 @@
-'''Some utilities.'''
+"""Some utilities."""
 
 import torch
 import torch.nn as nn
@@ -6,12 +6,8 @@ from torch.utils.data import DataLoader
 
 
 @torch.no_grad()
-def embed_loader(
-    emb: nn.Module,
-    data_loader: DataLoader,
-    return_labels: bool = False
-):
-    '''Embed all items in a data loader.'''
+def embed_loader(emb: nn.Module, data_loader: DataLoader, return_labels: bool = False):
+    """Embed all items in a data loader."""
 
     emb.train(False)  # activate train mode
 
@@ -22,7 +18,6 @@ def embed_loader(
 
     # loop over batches
     for x_batch, y_batch in data_loader:
-
         if return_labels:
             labels_list.append(y_batch)
 
