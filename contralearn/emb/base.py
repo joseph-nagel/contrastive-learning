@@ -59,7 +59,7 @@ class Embedding(LightningModule):
         self.lr = abs(lr)
 
         # store hyperparams
-        self.save_hyperparameters(ignore=["embedding"], logger=True)
+        self.save_hyperparameters(ignore=["embedding"])
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Embed the inputs."""

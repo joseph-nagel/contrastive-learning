@@ -99,4 +99,4 @@ class ConvEmbedding(Embedding):
         )
 
         # store hyperparams
-        self.save_hyperparameters(logger=True)
+        self.save_hyperparameters()
