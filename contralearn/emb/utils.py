@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 def embed_loader(emb: nn.Module, data_loader: DataLoader, return_labels: bool = False):
     """Embed all items in a data loader."""
 
-    emb.train(False)  # activate train mode
+    emb.train(False)  # activate eval mode
 
     embeddings_list = []
 
