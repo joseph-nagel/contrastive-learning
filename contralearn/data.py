@@ -65,7 +65,7 @@ class MNISTDataModule(LightningDataModule):
         _ = datasets.MNIST(self.data_dir, train=False, download=True)
 
     def setup(self, stage: str) -> None:
-        """Set up train/test/val. datasets."""
+        """Set up train/val./test datasets."""
 
         # create train/val. datasets
         if stage in ("fit", "validate"):
@@ -97,7 +97,7 @@ class MNISTDataModule(LightningDataModule):
             drop_last=True,
             shuffle=True,
             num_workers=self.num_workers,
-            pin_memory=self.num_workers > 0,
+            pin_memory=self.num_workers > 0,  # use page-locked memory if data is fetched in a parallel subprocess
         )
 
     def val_dataloader(self) -> DataLoader:
